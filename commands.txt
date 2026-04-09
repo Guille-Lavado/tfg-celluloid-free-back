@@ -28,6 +28,8 @@ sudo docker compose exec app php artisan make:model Comentario -m
 
 -- Controladores --
 sudo docker compose exec app php artisan make:controller DirectorController --resource
+sudo docker compose exec app php artisan make:controller GeneroController --resource
+sudo docker compose exec app php artisan make:controller ObraController --resource
 
 -- Acceso a DB --
 sudo docker compose exec db mysql -u celluloid_free_user -p
