@@ -2,7 +2,7 @@
 sudo docker compose build
 sudo docker compose up -d
 sudo docker compose exec app composer global require laravel/installer
-sudo docker compose exec app composer require laravel/ui:^2.0
+-- no usado -- sudo docker compose exec app composer require laravel/ui:^2.0
 sudo docker compose exec app composer require laravel/sanctum
 
 ----- Migración para Añadir Rol a Users -----
@@ -26,10 +26,18 @@ sudo docker compose exec app php artisan make:model Comentario -m
     sudo docker compose exec app php artisan migrate
     sudo docker compose exec app php artisan migrate:fresh --seed
 
--- Controladores --
+----- Controladores -----
 sudo docker compose exec app php artisan make:controller DirectorController --resource
 sudo docker compose exec app php artisan make:controller GeneroController --resource
 sudo docker compose exec app php artisan make:controller ObraController --resource
+sudo docker compose exec app php artisan make:controller Api/LikesController --resource
+sudo docker compose exec app php artisan make:controller Api/ComentarioController --resource
 
--- Acceso a DB --
+----- Controlador Auth -----
+sudo docker compose exec app php artisan make:controller Api/AuthController
+
+----- Publish the Sanctum configuration -----
+sudo docker compose exec app php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+
+----- Acceso a DB -----
 sudo docker compose exec db mysql -u celluloid_free_user -p

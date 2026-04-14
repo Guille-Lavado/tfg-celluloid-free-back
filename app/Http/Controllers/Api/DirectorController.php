@@ -30,19 +30,22 @@ class DirectorController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Crear y validar un nuevo Director
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'nombre'              => 'required|string|max:100',
+            'fecha_de_nacimiento' => 'nullable|date',
+            'biografia'           => 'nullable|string',
+        ]);
+ 
+        $director = Director::create($data);
+ 
+        return response()->json([
+            'message' => 'Director creado correctamente',
+            'data' => $director
+        ], 201);
     }
 
     /**
@@ -56,36 +59,41 @@ class DirectorController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Actualizar y validar un Director
      */
     public function update(Request $request, $id)
     {
-        //
+        $director = Director::findOrFail($id);
+ 
+        $data = $request->validate([
+            'nombre'              => 'sometimes|string|max:100',
+            'fecha_de_nacimiento' => 'sometimes|nullable|date',
+            'biografia'           => 'sometimes|nullable|string',
+        ]);
+ 
+        $director->update($data);
+ 
+        return response()->json([
+            'message' => 'Director actualizado correctamente',
+            'data' => $director
+        ], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Eliminar un Director
      */
     public function destroy($id)
     {
-        //
+        $director = Director::findOrFail($id);
+ 
+        try {
+            $director->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'message' => 'No se puede eliminar el director porque tiene obras asociadas'
+            ], 500);
+        }
+ 
+        return response()->json(['message' => 'Director eliminado correctamente'], 200);
     }
 }

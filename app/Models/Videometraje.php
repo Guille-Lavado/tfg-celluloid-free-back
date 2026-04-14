@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\User;
+
 class Videometraje extends Model
 {
     protected $table = 'videometraje';
@@ -40,5 +42,10 @@ class Videometraje extends Model
     public function comentarios()
     {
         return $this->hasMany(Comentario::class, 'id_video');
+    }
+
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'likes', 'id_video', 'id_user');
     }
 }

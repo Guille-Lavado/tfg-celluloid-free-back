@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DirectorController;
 use App\Http\Controllers\Api\GeneroController;
 use App\Http\Controllers\Api\ObraController;
-
+use App\Http\Controllers\Api\LikesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +18,8 @@ use App\Http\Controllers\Api\ObraController;
 |
 */
 
-// --- Directores --- 
-Route::get('/directores',      [DirectorController::class, 'index']);
-Route::get('/directores/{id}', [DirectorController::class, 'show']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 // --- Generos --- 
 Route::get('/generos',         [GeneroController::class, 'index']);
@@ -31,7 +31,14 @@ Route::delete('/generos/{id}', [GeneroController::class, 'destroy']);
 Route::get('/obras',      [ObraController::class, 'index']);   // ?nombre=&genero=&director=
 Route::get('/obras/{id}', [ObraController::class, 'show']);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+    // --- Directores --- 
+    Route::get('/directores',      [DirectorController::class, 'index']);
+    Route::get('/directores/{id}', [DirectorController::class, 'show']);
+
+    // --- Likes ---
+    Route::get('/video/{id}/likes',  [LikesController::class, 'count']);
+    Route::post('/video/{id}/likes', [LikesController::class, 'toggle']);
 });
