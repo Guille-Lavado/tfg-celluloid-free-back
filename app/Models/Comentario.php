@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\User;
+
 class Comentario extends Model
 {
     protected $table      = 'comentario';
@@ -23,5 +25,15 @@ class Comentario extends Model
         return [
             'fecha' => 'datetime',
         ];
+    }
+
+    public function videometraje()
+    {
+        return $this->belongsTo(Videometraje::class, 'id_video');
+    }
+ 
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

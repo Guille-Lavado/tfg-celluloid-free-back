@@ -59,9 +59,9 @@ class DatabaseSeeder extends Seeder
         Comentario::create([
             'id_video'  => $videoOdisea->id,
             'id_user'   => $usuario->id,
-            'contenido' => 'Una película que adelantó décadas a su tiempo.',
+            'contenido' => 'Una película que se adelantó décadas a su tiempo.',
         ]);
 
-        $usuario->likes()->attach($videoOdisea->id);
+        $usuario->puntuaciones()->attach($videoOdisea->id, ['valor' => 5]);
     }
 }

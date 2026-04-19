@@ -44,8 +44,9 @@ class Videometraje extends Model
         return $this->hasMany(Comentario::class, 'id_video');
     }
 
-    public function likes()
+    public function puntuaciones()
     {
-        return $this->belongsToMany(User::class, 'likes', 'id_video', 'id_user');
+        return $this->belongsToMany(User::class, 'puntuacion', 'id_video', 'id_user')
+            ->withPivot('valor');
     }
 }

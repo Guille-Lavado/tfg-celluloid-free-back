@@ -34,9 +34,11 @@ class User extends Authenticatable
         ];
     }
 
-    public function likes()
+    public function puntuaciones()
     {
-        return $this->belongsToMany(Videometraje::class, 'likes', 'id_user', 'id_video');
+        return $this->belongsToMany(Videometraje::class, 'puntuacion', 'id_user', 'id_video')
+             ->withPivot('valor');
+
     }
 
     public function comentarios()

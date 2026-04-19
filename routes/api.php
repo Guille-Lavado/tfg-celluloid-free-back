@@ -5,7 +5,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DirectorController;
 use App\Http\Controllers\Api\GeneroController;
 use App\Http\Controllers\Api\ObraController;
-use App\Http\Controllers\Api\LikesController;
+use App\Http\Controllers\Api\PuntuacionController;
+use App\Http\Controllers\Api\ComentarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +39,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/directores',      [DirectorController::class, 'index']);
     Route::get('/directores/{id}', [DirectorController::class, 'show']);
 
-    // --- Likes ---
-    Route::get('/video/{id}/likes',  [LikesController::class, 'count']);
-    Route::post('/video/{id}/likes', [LikesController::class, 'toggle']);
+    // --- Puntuaciones ---
+    Route::get('/puntuaciones/{id}',    [PuntuacionController::class, 'show']);
+    Route::post('/puntuaciones/{id}',   [PuntuacionController::class, 'toggle']);
+    Route::delete('/puntuaciones/{id}', [PuntuacionController::class, 'destroy']);
+
+    // --- Comentarios ---
+    Route::get('/videos/{id}/comentarios',  [ComentarioController::class, 'index']);
+    Route::post('/videos/{id}/comentarios', [ComentarioController::class, 'store']);
+    Route::delete('/comentarios/{id}',      [ComentarioController::class, 'destroy']);
+
+    // Favoritos
+    Route::get('/favoritos/obras',            [FavoritoController::class, 'obras']);
+    Route::post('/favoritos/obras/{id}',      [FavoritoController::class, 'toggleObra']);
+    Route::get('/favoritos/directores',       [FavoritoController::class, 'directores']);
+    Route::post('/favoritos/directores/{id}', [FavoritoController::class, 'toggleDirector']);
 });

@@ -9,7 +9,6 @@ sudo docker compose exec app composer require laravel/sanctum
 sudo docker compose exec app php artisan make:migration alter_table_user
 
 ----- Migraciones -----
-sudo docker compose exec app php artisan make:migration create_likes_table
 sudo docker compose exec app php artisan make:migration create_favorito_obra_table
 sudo docker compose exec app php artisan make:migration create_favorito_director_table
 
@@ -21,6 +20,7 @@ sudo docker compose exec app php artisan make:model Obra -m
 sudo docker compose exec app php artisan make:model PeliVideo -m
 sudo docker compose exec app php artisan make:model SerieVideo -m
 sudo docker compose exec app php artisan make:model Comentario -m
+sudo docker compose exec app php artisan make:model Puntuacion -m
 
     ----- Ejecutar Migraciones -----
     sudo docker compose exec app php artisan migrate
@@ -30,8 +30,9 @@ sudo docker compose exec app php artisan make:model Comentario -m
 sudo docker compose exec app php artisan make:controller DirectorController --resource
 sudo docker compose exec app php artisan make:controller GeneroController --resource
 sudo docker compose exec app php artisan make:controller ObraController --resource
-sudo docker compose exec app php artisan make:controller Api/LikesController --resource
+sudo docker compose exec app php artisan make:controller Api/PuntuacionController --resource
 sudo docker compose exec app php artisan make:controller Api/ComentarioController --resource
+sudo docker compose exec app php artisan make:controller Api/FavoritoController --resource
 
 ----- Controlador Auth -----
 sudo docker compose exec app php artisan make:controller Api/AuthController
