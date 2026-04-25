@@ -1,10 +1,9 @@
 ----- Crear Proyecto -----
 sudo docker compose build
 sudo docker compose up -d
-sudo docker compose exec app composer global require laravel/installer
+sudo docker compose exec app composer global require laravel/installer laravel/sanctum fruitcake/laravel-cors
+sudo docker compose exec app composer install
 -- no usado -- sudo docker compose exec app composer require laravel/ui:^2.0
-sudo docker compose exec app composer require laravel/sanctum
-sudo docker compose exec app composer require fruitcake/laravel-cors
 
 ----- Migración para Añadir Rol a Users -----
 sudo docker compose exec app php artisan make:migration alter_table_user
@@ -34,6 +33,7 @@ sudo docker compose exec app php artisan make:controller ObraController --resour
 sudo docker compose exec app php artisan make:controller Api/PuntuacionController --resource
 sudo docker compose exec app php artisan make:controller Api/ComentarioController --resource
 sudo docker compose exec app php artisan make:controller Api/FavoritoController --resource
+sudo docker compose exec app php artisan make:controller Api/UserController
 
 ----- Controlador Auth -----
 sudo docker compose exec app php artisan make:controller Api/AuthController

@@ -73,4 +73,9 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada correctamente']);
     }
+
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
 }

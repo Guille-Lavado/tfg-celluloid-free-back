@@ -17,8 +17,18 @@ export default function LoginModal({ show, onHide, onLogin }) {
         setError(null);
         try {
             await api.get("/sanctum/csrf-cookie");
+            console.log("✅ CSRF cookie obtenida")
+
             const res = await api.post("/api/login", form);
-            onLogin(res.data);
+            console.log("✅ Login correcto")
+
+            const { access_token, user } = res.data
+            console.log("✅ Usuario:", user)
+
+            // Guarda el token en axios para todas las peticiones siguientes
+            api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`
+
+            onLogin(user);
             onHide();
         } catch (err) {
             setError("Email o contraseña incorrectos.");
@@ -43,7 +53,6 @@ export default function LoginModal({ show, onHide, onLogin }) {
                             value={form.email}
                             onChange={handleChange}
                             placeholder="usuario@celluloid.com"
-                            required
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -54,7 +63,6 @@ export default function LoginModal({ show, onHide, onLogin }) {
                             value={form.password}
                             onChange={handleChange}
                             placeholder="••••••••"
-                            required
                         />
                     </Form.Group>
                 </Modal.Body>
