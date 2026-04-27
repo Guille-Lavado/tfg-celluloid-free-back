@@ -24,7 +24,6 @@ export default function AdminObras() {
     try {
       const res = await api.get("/api/obras");
       setObras(res.data);
-      console.log(res.data);
     } catch {
       setError("Error al cargar las obras.");
     }

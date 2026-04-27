@@ -5,16 +5,33 @@ services:
         user: sammy
         uid: 1000
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: ./backend/Dockerfile
     image: app-back
     container_name: app-back
     restart: unless-stopped
+    env_file:
+      - .env
     working_dir: /var/www/
     volumes:
-      - ./:/var/www
+      - ./backend:/var/www
     networks:
       - app-network
-  
+
+  front:
+    image: node:24-alpine
+    container_name: app-front
+    restart: unless-stopped
+    working_dir: /app
+    # Instala dependencias y arranca el servidor de desarrollo
+    command: sh -c "rm -rf node_modules/.package-lock.json && npm install && npm start"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
   db:
     image: mysql:5.7
     platform: linux/amd64
@@ -28,7 +45,7 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+      - ./backend/docker-compose/mysql:/docker-entrypoint-initdb.d
     networks:
       - app-network
   
@@ -40,8 +57,8 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ./:/var/www
-      - ./docker-compose/nginx:/etc/nginx/conf.d
+      - ./backend:/var/www
+      - ./backend/docker-compose/nginx:/etc/nginx/conf.d
     networks:
       - app-network
 

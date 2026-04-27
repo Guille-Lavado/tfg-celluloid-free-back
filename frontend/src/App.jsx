@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminObras, AdminUsuarios, AdminDirectores, AdminGeneros } from "./pages/index";
 import LoginModal from "./components/LoginModal";
 import AdminLayout from "./components/AdminLayout";
-import { Container } from "react-bootstrap";
 import api from "./api/axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 

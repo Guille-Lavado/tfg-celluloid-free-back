@@ -1,17 +1,18 @@
 # Backend
-/node_modules
-/public/hot
-/public/storage
-/storage/*.key
-/vendor
+*/node_modules
+*/public/hot
+*/public/storage
+*/storage/*.key
+*/vendor
 .env
-.phpunit.result.cache
-.idea
-.bash_history
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
+*/.phpunit.result.cache
+*/.idea
+*/.bash_history
+*/Homestead.json
+*/Homestead.yaml
+*/npm-debug.log
+*/yarn-error.log
 
 # Frontend
 */node_modules
+*/package-lock.json
