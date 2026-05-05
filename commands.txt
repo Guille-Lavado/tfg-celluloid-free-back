@@ -8,8 +8,16 @@ sudo docker compose exec app composer install
 ----- Backblaze B2 -----
 sudo docker compose exec app composer require league/flysystem-aws-s3-v3 "^3.0"
 
+----- Probar B2 -----
+sudo docker compose exec app php artisan config:clear
+Storage::disk('b2')->put('test.txt', 'hola');
+Storage::disk('b2')->url('test.txt');
+
 ----- Version -----
 sudo docker compose exec app php artisan --version
+
+----- Ver Logs -----
+sudo docker compose exec app tail -20 storage/logs/laravel.log
 
 ----- Rutas -----
 sudo docker compose exec app php artisan route:list
@@ -20,6 +28,9 @@ sudo docker compose exec app php artisan make:migration alter_table_user
 ----- Migraciones -----
 sudo docker compose exec app php artisan make:migration create_favorito_obra_table
 sudo docker compose exec app php artisan make:migration create_favorito_director_table
+
+----- Migracion para Actualizar Modelo de Datos -----
+sudo docker compose exec app php artisan make:migration add_expires_at_to_personal_access_tokens_table
 
 ----- Modelos y Migraciones -----
 sudo docker compose exec app php artisan make:model Director -m

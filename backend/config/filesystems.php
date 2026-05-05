@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DRIVER', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,13 +55,29 @@ return [
             'visibility' => 'public',
         ],
 
-        's3' => [
-            'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
+        // 's3' => [
+        //     'driver' => 's3',
+        //     'key' => env('AWS_ACCESS_KEY_ID'),
+        //     'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        //     'region' => env('AWS_DEFAULT_REGION'),
+        //     'bucket' => env('AWS_BUCKET'),
+        //     'url' => env('AWS_URL'),
+        // ],
+
+        'b2' => [
+            'driver'                  => 's3',
+            'key'                     => env('B2_KEY'),
+            'secret'                  => env('B2_SECRET'),
+            'region'                  => env('B2_REGION'),
+            'bucket'                  => env('B2_BUCKET'),
+            'endpoint'                => env('B2_ENDPOINT'),
+            'url'                     => env('B2_PUBLIC_URL'),
+            'use_path_style_endpoint' => true,
+            'throw'                   => true,
+            'visibility'              => 'public',
+            'options'                 => [
+                'ACL' => '',
+            ],
         ],
 
     ],

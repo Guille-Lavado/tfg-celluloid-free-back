@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Obra;
@@ -23,7 +24,7 @@ class ObraController extends Controller
 
         $obras = Obra::with(['genero', 'director']);
 
-        // Filtrar obras si exite el parámetro nombre, genero o director
+        // Filtrar obras si existe el parámetro nombre, genero o director
         if ($nombre) {
             $obras = $obras->where('titulo', 'like', "%{$nombre}%");
         } elseif ($genero) {
@@ -60,51 +61,52 @@ class ObraController extends Controller
 
     /**
      * Crear una nueva Obra y Videometraje con relación de PeliVideo o SerieVideo
+     * Acepta multipart/form-data con archivo de vídeo para subir a B2
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'titulo'                   => 'required|string|max:255',
-            'sinopsis'                 => 'nullable|string',
-            'poster'                   => 'nullable|string|url',
-            'id_genero'                => 'nullable|exists:genero,id',
-            'id_director'              => 'required|exists:director,id',
-            'tipo'                     => 'required|in:pelicula,serie',
+        $request->validate([
+            'titulo'      => 'required|string|max:255',
+            'sinopsis'    => 'nullable|string',
+            'poster'      => 'nullable|string|url',
+            'id_genero'   => 'nullable|exists:genero,id',
+            'id_director' => 'required|exists:director,id',
+            'tipo'        => 'required|in:pelicula,serie',
             // Película
-            'url_video'                => 'required_if:tipo,pelicula|nullable|string|url',
-            'duracion'                 => 'required_if:tipo,pelicula|nullable|integer|min:1',
-            'nombre_video'             => 'nullable|string|max:255',
+            'video'       => 'required_if:tipo,pelicula|nullable|file|mimetypes:video/mp4,video/x-matroska,video/avi,video/quicktime|max:2097152',
+            'nombre'      => 'nullable|string|max:255',
             // Serie
-            'capitulos'                => 'required_if:tipo,serie|nullable|array|min:1',
-            'capitulos.*.url_video'    => 'required|string|url',
-            'capitulos.*.duracion'     => 'required|integer|min:1',
-            'capitulos.*.nombre'       => 'nullable|string|max:255',
-            'capitulos.*.temporada'    => 'required|integer|min:1',
-            'capitulos.*.episodio'     => 'required|integer|min:1',
+            'capitulos'             => 'required_if:tipo,serie|nullable|array|min:1',
+            'capitulos.*.video'     => 'required|file|mimetypes:video/mp4,video/x-matroska,video/avi,video/quicktime|max:2097152',
+            'capitulos.*.nombre'    => 'nullable|string|max:255',
+            'capitulos.*.temporada' => 'required|integer|min:1',
+            'capitulos.*.episodio'  => 'required|integer|min:1',
         ]);
- 
-        $obra = DB::transaction(function () use ($data) {
+
+        $obra = DB::transaction(function () use ($request) {
             $obra = Obra::create([
-                'titulo'      => $data['titulo'],
-                'sinopsis'    => $data['sinopsis'] ?? null,
-                'poster'      => $data['poster'],
-                'id_genero'   => $data['id_genero'],
-                'id_director' => $data['id_director'],
+                'titulo'      => $request->titulo,
+                'sinopsis'    => $request->sinopsis,
+                'poster'      => $request->poster,
+                'id_genero'   => $request->id_genero,
+                'id_director' => $request->id_director,
             ]);
- 
-            if ($data['tipo'] === 'pelicula') {
+
+            if ($request->tipo === 'pelicula') {
+                $url = $this->subirVideo($request->file('video'), 'peliculas');
                 $video = Videometraje::create([
-                    'url_video' => $data['url_video'],
-                    'duracion'  => $data['duracion'],
-                    'nombre'    => $data['nombre_video'] ?? null,
+                    'url_video' => $url,
+                    'duracion'  => 0,
+                    'nombre'    => $request->nombre ?? $obra->titulo,
                 ]);
                 PeliVideo::create(['id_video' => $video->id, 'id_obra' => $obra->id]);
             } else {
-                foreach ($data['capitulos'] as $cap) {
+                foreach ($request->capitulos as $index => $cap) {
+                    $url = $this->subirVideo($request->file("capitulos.{$index}.video"), 'series');
                     $video = Videometraje::create([
-                        'url_video' => $cap['url_video'],
-                        'duracion'  => $cap['duracion'],
-                        'nombre'    => $cap['nombre'] ?? null,
+                        'url_video' => $url,
+                        'duracion'  => 0,
+                        'nombre'    => $cap['nombre'] ?? "{$obra->titulo} S{$cap['temporada']}E{$cap['episodio']}",
                     ]);
                     SerieVideo::create([
                         'id_video'  => $video->id,
@@ -114,21 +116,24 @@ class ObraController extends Controller
                     ]);
                 }
             }
- 
+
             return $obra;
         });
- 
-        return response()->json($obra->load(['genero', 'director', 'peliVideo.videometraje', 'capitulosVideo.videometraje']), 201);
+
+        return response()->json(
+            $obra->load(['genero', 'director', 'peliVideo.videometraje', 'capitulosVideo.videometraje']),
+            201
+        );
     }
 
     /**
-     * Obterner Obra por Id
+     * Obtener Obra por Id
      */
     public function show($id)
     {
         $obra = Obra::with(['genero', 'director', 'peliVideo.videometraje', 'capitulosVideo.videometraje'])
             ->findOrFail($id);
- 
+
         return response()->json($obra, 200);
     }
 
@@ -138,7 +143,7 @@ class ObraController extends Controller
     public function update(Request $request, $id)
     {
         $obra = Obra::findOrFail($id);
- 
+
         $data = $request->validate([
             'titulo'      => 'sometimes|string|max:255',
             'sinopsis'    => 'sometimes|nullable|string',
@@ -146,9 +151,9 @@ class ObraController extends Controller
             'id_genero'   => 'sometimes|exists:genero,id',
             'id_director' => 'sometimes|exists:director,id',
         ]);
- 
+
         $obra->update($data);
- 
+
         return response()->json([
             'message' => 'Obra actualizada correctamente',
             'data' => $obra->load(['genero', 'director'])
@@ -162,7 +167,16 @@ class ObraController extends Controller
     {
         $obra = Obra::findOrFail($id);
         $obra->delete();
- 
+
         return response()->json(['message' => 'Obra eliminada correctamente'], 200);
+    }
+
+    /**
+     * Sube un archivo de vídeo a Backblaze B2 y devuelve la URL pública
+     */
+    private function subirVideo($archivo, string $carpeta): string
+    {
+        $path = $archivo->store($carpeta, 'b2');
+        return Storage::disk('b2')->url($path);
     }
 }

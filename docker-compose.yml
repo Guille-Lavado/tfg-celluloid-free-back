@@ -15,6 +15,7 @@ services:
     volumes:
       - ./backend:/var/www
       - ./.env:/var/www/.env
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
     networks:
       - app-network
 
